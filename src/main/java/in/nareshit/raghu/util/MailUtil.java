@@ -20,7 +20,7 @@ public class MailUtil {
 			String[] bcc,
 			String subject,
 			String text,
-			Resource file
+			Resource[] files
 			) 
 	{
 		boolean flag = false;
@@ -30,7 +30,7 @@ public class MailUtil {
 			MimeMessage message = sender.createMimeMessage();
 
 			//2. use Helper class and fill details
-			MimeMessageHelper helper = new MimeMessageHelper(message, file!=null);
+			MimeMessageHelper helper = new MimeMessageHelper(message, (files!=null && files.length>0));
 			helper.setTo(to);
 			
 			if(cc!=null && cc.length>0)
@@ -40,11 +40,13 @@ public class MailUtil {
 				helper.setBcc(bcc);
 			
 			helper.setSubject(subject);
-			helper.setText(text);
+			//helper.setText(text);//false-send as Plain text
+			helper.setText(text,true);//send as HTML
 
-			if(file!=null) {
+			if((files!=null && files.length>0)) {
 				//filename , file object
-				helper.addAttachment(file.getFilename(), file);
+				for(Resource file:files)
+					helper.addAttachment(file.getFilename(), file);
 			}
 			
 			//3. send email
